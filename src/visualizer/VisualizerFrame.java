@@ -664,6 +664,8 @@ private void makeTreeInvisibleMenuItemActionPerformed(java.awt.event.ActionEvent
         if (playThread!=null) {
             playThread.quit();
         }
+        renderPanel.destroy();
+        
     }//GEN-LAST:event_formWindowClosing
 
 

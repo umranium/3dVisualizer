@@ -199,6 +199,10 @@ public class RenderPanel extends JPanel {
       }
     });
   }
+  
+  public void destroy() {
+    this.scheduledExecutorService.shutdown();
+  }
 
   private void resetLookAtValues(boolean resetLocation) {
     if (resetLocation) {
