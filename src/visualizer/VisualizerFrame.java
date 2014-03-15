@@ -817,19 +817,22 @@ private void makeTreeInvisibleMenuItemActionPerformed(java.awt.event.ActionEvent
                         timeScale.getMaxTime()==Integer.MAX_VALUE) {
                     return;
                 }
-            
-                int start = timeScale.getMinTime();
+                
+                final int start = visibilityScroller.getValue();
+                final long startTime = System.currentTimeMillis();
+                final long[] current = new long[] {start};
                 int amount = visibilityScrollerWndSizeSpnModel.getNumber().intValue();
-                while (!quit && start+amount<timeScale.getMaxTime()) {
-                    final int finalStart = start;
+                while (!quit && current[0]+amount<timeScale.getMaxTime()) {
                     java.awt.EventQueue.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            visibilityScroller.setValue(finalStart);
+                          long elapsedTime = System.currentTimeMillis() - startTime;
+                          current[0] = start + (Common.FREQ*elapsedTime)/1000;
+                          if (current[0]<timeScale.getMaxTime()) {
+                            visibilityScroller.setValue((int)current[0]);
+                          }
                         }
                     });
-
-                    ++start;
                     amount = visibilityScrollerWndSizeSpnModel.getNumber().intValue();
                     try {
                         Thread.sleep(50);
