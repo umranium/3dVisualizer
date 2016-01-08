@@ -87,7 +87,11 @@ public abstract class RenderableComponent implements Renderable {
     }
 
     public void setVisible(boolean visible) {
-        visibility.setVisible(visible);
+        visibility.setVisible(visible, false);
+    }
+    
+    public void setVisible(boolean visible, boolean propagateUpward) {
+        visibility.setVisible(visible, propagateUpward);
     }
     
     public void setTreeVisible(boolean visible) {

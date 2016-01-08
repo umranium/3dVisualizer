@@ -101,7 +101,8 @@ public class RenderPanel extends JPanel {
     KEY_INCR_LOC_Y,
     KEY_DECR_LOC_Y,
     KEY_INCR_LOC_Z,
-    KEY_DECR_LOC_Z,};
+    KEY_DECR_LOC_Z,
+  };
 
   public interface LookAtChangedEventHandler {
 
@@ -286,8 +287,9 @@ public class RenderPanel extends JPanel {
     glcanvas.addMouseWheelListener(new MouseWheelListener() {
       @Override
       public void mouseWheelMoved(MouseWheelEvent e) {
+        ModifiersState state = processModifierScale(e.getModifiers());
         double dist = getLookAtDistance();
-        dist += e.getPreciseWheelRotation();
+        dist += e.getPreciseWheelRotation()*state.amountScale;
         setLookAtDistance(dist);
         refreshScene();
       }
@@ -587,7 +589,7 @@ public class RenderPanel extends JPanel {
       r.destroy(this, glautodrawable);
     }
 
-    glu.destroy();
+    //glu.destroy();
     glu = null;
 
     glut = null;
@@ -668,8 +670,19 @@ public class RenderPanel extends JPanel {
       lastSceneDrawTime = System.currentTimeMillis();
     }
   }
+  
+  private class ModifiersState {
+    final boolean shiftDown, ctrlDown;
+    final float amountScale;
 
-  public boolean processKeys(int keyCode, int modifiers) {
+    public ModifiersState(boolean shiftDown, boolean ctrlDown, float amountScale) {
+      this.shiftDown = shiftDown;
+      this.ctrlDown = ctrlDown;
+      this.amountScale = amountScale;
+    }
+  }
+  
+  private ModifiersState processModifierScale(int modifiers) {
     boolean shiftDown = (modifiers & KeyEvent.SHIFT_MASK) > 0;
     int ctrlMask = KeyEvent.CTRL_MASK;
     if (OsCommon.isMacOs) {
@@ -690,6 +703,34 @@ public class RenderPanel extends JPanel {
         }
       }
     }
+
+    return new ModifiersState(shiftDown, ctrlDown, amountScale);
+  }
+
+  public boolean processKeys(int keyCode, int modifiers) {
+//    boolean shiftDown = (modifiers & KeyEvent.SHIFT_MASK) > 0;
+//    int ctrlMask = KeyEvent.CTRL_MASK;
+//    if (OsCommon.isMacOs) {
+//      ctrlMask = KeyEvent.META_MASK;
+//    }
+//
+//    boolean ctrlDown = (modifiers & ctrlMask) > 0;
+//
+//    float amountScale = 1.0f;
+//    if (ctrlDown && shiftDown) {
+//      amountScale = 25.0f;
+//    } else {
+//      if (shiftDown) {
+//        amountScale = 0.25f;
+//      } else {
+//        if (ctrlDown) {
+//          amountScale = 5.0f;
+//        }
+//      }
+//    }
+
+    final ModifiersState state = processModifierScale(modifiers);
+    final float amountScale = state.amountScale;
 
     boolean received = false;
 
@@ -735,7 +776,7 @@ public class RenderPanel extends JPanel {
         break;
       }
       case KEY_RESET_VALUES: {
-        if (ctrlDown) {
+        if (state.ctrlDown) {
           resetLookAtValues(true);
         } else {
           resetLookAtValues(false);
@@ -790,6 +831,8 @@ public class RenderPanel extends JPanel {
   }
 
   public void refreshScene(boolean scheduled) {
+    if (glcanvas==null) return;
+      
     long currentTime = System.currentTimeMillis();
     //  avoid fast updates
     if (currentTime - lastSceneDrawTime > 100L) {

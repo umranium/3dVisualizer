@@ -27,10 +27,14 @@ public class CachedVisibility {
         return visible;
     }
     
-    public void setVisible(boolean visible) {
+    public void setVisible(boolean visible, boolean propagateUp) {
 //        System.out.println("set to "+visible);
         this.visible = visible;
-        propagateHierarchyVisibilityDown();
+        if (visible && propagateUp) {
+          propagateVisibilityUp(visible);
+        } else {
+          propagateHierarchyVisibilityDown();
+        }
     }
     
     public void setTreeVisible(boolean visible) {
@@ -71,4 +75,12 @@ public class CachedVisibility {
         }
     }
     
+    private void propagateVisibilityUp(boolean visible) {
+        this.visible = visible;
+        if (parent!=null) {
+          parent.propagateVisibilityUp(visible);
+        } else {
+          propagateHierarchyVisibilityDown();
+        }
+    }
 }

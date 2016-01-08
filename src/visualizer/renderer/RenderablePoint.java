@@ -39,6 +39,14 @@ public class RenderablePoint extends RenderableComponent {
     private PointType pointType;
     private ObjectInfo objectInfo = new ObjectInfo();
 
+    public RenderablePoint(double[] location) {
+      this(new float[]{
+        (float)location[0],
+        (float)location[1],
+        (float)location[2],
+      });
+    }
+    
     public RenderablePoint(float[] location) {
         super();
         this.location = location;

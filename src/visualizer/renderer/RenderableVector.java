@@ -48,6 +48,11 @@ public class RenderableVector extends RenderableComponent {
         build();
     }
     
+    public RenderableVector(double[] from, double[] to) {
+      this(new float[]{(float)from[0], (float)from[1], (float)from[2]},
+              new float[]{(float)to[0], (float)to[1], (float)to[2]});
+    }
+    
     private void build() {
         Vector3f back;    
         Vector3f perp1;
